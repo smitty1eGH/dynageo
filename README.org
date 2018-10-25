@@ -1,0 +1,4 @@
+* dynageo
+
+  For a given list of data, "DATA", with an id field, "DATA_ID" corresponding to position in the list, implement a geopatial index for DATA as a DynamoDB table.
+
