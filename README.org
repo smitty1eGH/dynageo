@@ -1,4 +1,18 @@
-* dynageo
+* Dynageo
 
   For a given list of data, "DATA", with an id field, "DATA_ID" corresponding to position in the list, implement a geopatial index for DATA as a DynamoDB table.
 
+** TODO Data Ingest
+
+  The system will use zip code data from TIGER
+
+#+NAME Data Ingest
+#+BEGIN_SRC plantuml :file docs/data_ingest.png
+title "Extract, Transform, Load Path"
+TIGER -> ZipCodeShapefile
+ZipCodeShapefile -> BboxSqliteTable
+BboxSqliteTable -> DynamoDBSchema
+#+END_SRC
+
+#+RESULTS:
+[[file:docs/data_ingest.png]]
