@@ -1,3 +1,11 @@
 *.pyc
 __pycache__/
 .mypy_cache/
+build/
+dist/
+/dynageo.egg-info/PKG-INFO
+/dynageo.egg-info/SOURCES.txt
+/dynageo.egg-info/dependency_links.txt
+/dynageo.egg-info/entry_points.txt
+/dynageo.egg-info/requires.txt
+/dynageo.egg-info/top_level.txt
