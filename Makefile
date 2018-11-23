@@ -1,7 +1,7 @@
 .PHONY: help eserv ecli b c t tidy ddb
 .DEFAULT_GOAL := help
 
-FILES=`find . -type f -name *.py`
+FILES=`find . -type f -name "*.py"`
 export PATH:=/home/smitty/.local/bin:$(PATH)
 export DPATH:=/home/smitty/.local/lib/python3.7/site-packages
 

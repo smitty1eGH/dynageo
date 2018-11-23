@@ -1,5 +1,6 @@
 import click
 
+from dynageo.dynageo import dbInit, dbLoad
 
 @click.group()
 def main():
@@ -7,11 +8,13 @@ def main():
     """
     pass
 
+
 @main.command()
 def dbInit():
     """Initialize the stagging db to hold shapefile data
     """
     pass
+
 
 @main.command()
 def dbLoad():
@@ -26,11 +29,13 @@ def dyInit():
     """
     pass
 
+
 @main.command()
 def dyLoad():
     """Load dynamodb table from the staging db table.
     """
     pass
+
 
 @main.command()
 def dyQuery():
