@@ -2,6 +2,7 @@ import click
 
 from dynageo.dynageo import dbInit, dbLoad
 
+
 @click.group()
 def main():
     """Main interface
@@ -10,28 +11,27 @@ def main():
 
 
 @main.command()
-def dbInit():
+def databaseInit():
     """Initialize the stagging db to hold shapefile data
     """
-    pass
-
+    dbInit()
 
 @main.command()
-def dbLoad():
+def databaseLoad():
     """Read shapefile data into staging db.
     """
-    pass
+    dbLoad()
 
 
 @main.command()
-def dyInit():
+def dynamoInit():
     """Initialize the dynamodb table
     """
     pass
 
 
 @main.command()
-def dyLoad():
+def dynamoLoad():
     """Load dynamodb table from the staging db table.
     """
     pass

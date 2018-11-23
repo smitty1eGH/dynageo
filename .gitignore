@@ -9,3 +9,4 @@ dist/
 /dynageo.egg-info/entry_points.txt
 /dynageo.egg-info/requires.txt
 /dynageo.egg-info/top_level.txt
+/data/ggs650.db

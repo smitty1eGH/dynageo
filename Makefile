@@ -1,4 +1,4 @@
-.PHONY: help eserv ecli b c t tidy ddb
+.PHONY: help eserv ecli b c t tidy ddb install reqsFr reqsInst
 .DEFAULT_GOAL := help
 
 FILES=`find . -type f -name "*.py"`
@@ -18,6 +18,9 @@ help:
 	@echo "t          run tests quickly with the default Python"
 	@echo "tidy       fix style, type check, and test"
 	@echo "ddb        start dynamodb service"
+	@echo "install    run setup for dynageo"
+	@echo "reqsFr     freeze requirements.txt in etc"
+	@echo "reqsInst   install requirements.txt in etc"
 	@echo ""
 eserv:
 	@find ~/.emacs.d -type f -name ".elc" -delete && emacs --daemon && echo "\n" && emacsclient -t --eval '(dired-jump)'
@@ -33,3 +36,9 @@ tidy: b c t
 	echo "tidy"
 ddb:
 	@java -Djava.library.path=~/bin/DynamoDBLocal_lib -jar ~/bin/DynamoDBLocal.jar -sharedDb &
+install:
+	@python setup.py install
+reqsFr:
+	@pip freeze > etc/requirements.txt
+reqsInst:
+	@pip install -r etc/requirements.txt
