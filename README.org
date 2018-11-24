@@ -2,49 +2,29 @@
 
   For a given list of data, "DATA", with an id field, "DATA_ID" corresponding to position in the list, implement a geopatial index for DATA as a DynamoDB table.
 
-** TODO Data Ingest
+** Installation
+
+- python -m venv dynageo
+- cd dynageo
+- . bin/activate
+- git clone https://github.com/smitty1eGH/dynageo.git
+- cd dynageo
+- make reqsInst
+- make install
+
+Discussion: we make a virtual environment. Change to that environment directory and activate. 
+Check out the project from github, and do into the project directory. 
+We can then install the dependencies and install dynageo itself.
+
+** Data Ingest
 
   We will use data from TIGER
-
-***  Sample session to explore, using Virginia Congressional districts:
-
-https://www2.census.gov/geo/tiger/TIGER2012/VTD/
-
-cd right into shapfile directory
-
-$ python
-
->>> import shapefile
-
->>> x=shapefile.Reader('tl_2012_51_vtd10')
-
->>> x.fields
-
-[('DeletionFlag', 'C', 1, 0), ['STATEFP10', 'C', 2, 0], ['COUNTYFP10', 'C', 3, 0], ['VTDST10', 'C', 6, 0], ['GEOID10', 'C', 11, 0], ['VTDI10', 'C', 1, 0], ['NAME10', 'C', 100, 0], ['NAMELSAD10', 'C', 100, 0], ['LSAD10', 'C', 2, 0], ['MTFCC10', 'C', 5, 0], ['FUNCSTAT10', 'C', 1, 0], ['ALAND10', 'N', 14, 0], ['AWATER10', 'N', 14, 0], ['INTPTLAT10', 'C', 11, 0], ['INTPTLON10', 'C', 12, 0]]
-
->>> y=x.shapeRecords()
-
->>> y[1].record
-
-['51', '113', '001', '51113001', 'A', 'Oak Park', 'Oak Park Voting District', 'V2', 'G5240', 'N', 79308400, 649175, '+38.3534639', '-078.1428270']
-
->>> y[1].shape.bbox
-
-Note here that's a West longitude, North latitude
-
-[-78.215437, 38.278216, -78.082657, 38.407351]
-
->>> y[1].shape.points
-
-[(-78.215131, 38.381068), (-78.215103, 38.381118), (-78.215019, 38.381243999999995), (-78.214984, 38.381282999999996), (-78.21488, 38.381375999999996), (-78.214775, 38.381431), (-78.214719, 38.381447), (-78.214629, 38.381453), (-78.214545, 38.381447), (-78.214489, 38.381431), (-78.214413, 38.381398), (-78.214294, 38.381354), (-78.214203, 38.381343), (-78.21405, 38.381364999999995), (-78.21400799999999, 38.381387), (-78.213917, 38.381453), (-78.213841, 38.381492), (-78.21377799999999, 38.381502), (-78.21372199999999, 38.381496999999996), (-78.213641, 38.381451999999996), (-78.21352, 38.381403999999996) . . . wm
-
-
 
 #+NAME Data Ingest
 #+BEGIN_SRC plantuml :file docs/data_ingest.png
 title "Extract, Transform, Load Path"
-TIGER -> ZipCodeShapefile
-ZipCodeShapefile -> BboxSqliteTable
+TIGER -> CongDistrictShapefile
+CongDistrictShapefile -> BboxSqliteTable
 BboxSqliteTable -> DynamoDBSchema
 #+END_SRC
 

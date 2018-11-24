@@ -6,7 +6,7 @@ from typing import *
 
 import shapefile
 
-from meta import D, CREATE, INSERT
+from .meta import D, CREATE, INSERT
 
 logger = logging.getLogger("dynageo")
 

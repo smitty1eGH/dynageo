@@ -1,12 +1,13 @@
-from setuptools import setup
+from setuptools import setup,find_packages
 
 setup(
     name="dynageo",
     version="0.1",
-    py_modules=["dynageo"],
+    py_modules=["dynageocli"],
+    packages=find_packages(),
     install_requires=["Click"],
     entry_points="""
         [console_scripts]
-        dynageo=dynageo:main
+        dynageo=dynageocli:main
     """,
 )

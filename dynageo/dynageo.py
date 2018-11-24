@@ -148,4 +148,4 @@ class BboxSides(Model):
 
 
 if __name__ == "__main__":
-    logger.debug("Hello, world!")
+    BboxSides.create_table(read_capacity_units=1, write_capacity_units=1)

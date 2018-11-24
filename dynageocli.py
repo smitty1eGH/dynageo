@@ -1,6 +1,6 @@
 import click
 
-from dynageo.dynageo import dbInit, dbLoad
+from data.etl import dbInit, dbLoad
 
 
 @click.group()

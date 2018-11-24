@@ -27,6 +27,7 @@ def xFields() -> List[str]:
     """
     return ['bbox','points','latMax','latMin','lonMax','lonMin']
 
+@pytest.mark.skip("Scratch function for use in working on sqlite db.")
 def test_dbInit_scratch(sqlMemC: sqlite3.Connection, dataPath :str, xFields :List[str]):
     """We are adding an autonumber field called dist_id, the given fields in the
          shapefile, and the additional management fields documented above.
