@@ -10,3 +10,5 @@ dist/
 /dynageo.egg-info/requires.txt
 /dynageo.egg-info/top_level.txt
 /data/ggs650.db
+logs/
+/shared-local-instance.db

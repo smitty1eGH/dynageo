@@ -1,9 +1,10 @@
 import hashlib
 import logging
 import logging.config
+import struct
 from typing import *
 from pynamodb.models import Model
-from pynamodb.indexes import LocalSecondaryIndex, IncludeProjection
+from pynamodb.indexes import GlobalSecondaryIndex, IncludeProjection
 from pynamodb.attributes import (
     UnicodeAttribute,
     NumberAttribute,
@@ -15,14 +16,20 @@ logging.config.fileConfig("etc/logging.conf", disable_existing_loggers=False)
 logger = logging.getLogger("dynageo")
 
 
-def hash_sides(
-    lat_u: float, lat_l: float, lon_w: float, lon_e: float, elev: float = 0.0
-):
-    """Return sha256 hash of the values concatenated and converted to a byte string. 
+def hash_sides(lat_u: float, lat_l: float, lon_w: float, lon_e: float) -> str:
+    """Return sha256 hash of the values concatenated and converted to a string.
     """
     m = hashlib.sha256()
-    m.update(b"%s_%s_%s_%s" % (lat_u, lat_l, lon_w, lon_e))
-    return m.digest()
+    m.update(
+        b"%s_%s_%s_%s"
+        % (
+            struct.pack("f", lat_u),
+            struct.pack("f", lat_l),
+            struct.pack("f", lon_w),
+            struct.pack("f", lon_e),
+        )
+    )
+    return str(m.digest())
 
 
 class Criteria:
@@ -39,21 +46,7 @@ class Results:
     pass
 
 
-def load_bboxes() -> int:
-    """Populate the bounding box table make it a batch job.
-       Return the number of records inserted.
-    """
-    pass
-
-
-def query_bboxes(c: Criteria) -> Results:
-    """Query the table. Break the Criteria out against the indices. Load the returns
-         into the Results.
-    """
-    pass
-
-
-class BboxLatUIndex(LocalSecondaryIndex):
+class BboxLatUIndex(GlobalSecondaryIndex):
     """LocalSecondaryIndex for lat_u attribute.
     """
 
@@ -61,13 +54,12 @@ class BboxLatUIndex(LocalSecondaryIndex):
         index_name = "lat-u-index"
         read_capacity_units = 2
         write_capacity_units = 1
-        projection = IncludeProjection(rangestamp, ids)
+        projection = IncludeProjection(["rangestamp", "ids"])
 
-    hashkey = UnicodeAttribute(hash_key=True)
-    lat_u = NumberAttribute(range_key=True)
+    lat_u = NumberAttribute(hash_key=True)
 
 
-class BboxLatLIndex(LocalSecondaryIndex):
+class BboxLatLIndex(GlobalSecondaryIndex):
     """LocalSecondaryIndex for lat_l attribute.
     """
 
@@ -75,13 +67,12 @@ class BboxLatLIndex(LocalSecondaryIndex):
         index_name = "lat-l-index"
         read_capacity_units = 2
         write_capacity_units = 1
-        projection = IncludeProjection(rangestamp, ids)
+        projection = IncludeProjection(["rangestamp", "ids"])
 
-    hashkey = UnicodeAttribute(hash_key=True)
     lat_l = NumberAttribute(range_key=True)
 
 
-class BboxLonWIndex(LocalSecondaryIndex):
+class BboxLonWIndex(GlobalSecondaryIndex):
     """LocalSecondaryIndex for lon_w attribute.
     """
 
@@ -89,13 +80,12 @@ class BboxLonWIndex(LocalSecondaryIndex):
         index_name = "lon-w-index"
         read_capacity_units = 2
         write_capacity_units = 1
-        projection = IncludeProjection(rangestamp, ids)
+        projection = IncludeProjection(["rangestamp", "ids"])
 
-    hashkey = UnicodeAttribute(hash_key=True)
-    lon_w = NumberAttribute(range_key=True)
+    lon_w = NumberAttribute(hash_key=True)
 
 
-class BboxLonEIndex(LocalSecondaryIndex):
+class BboxLonEIndex(GlobalSecondaryIndex):
     """LocalSecondaryIndex for lon_e attribute.
     """
 
@@ -103,10 +93,9 @@ class BboxLonEIndex(LocalSecondaryIndex):
         index_name = "lon-e-index"
         read_capacity_units = 2
         write_capacity_units = 1
-        projection = IncludeProjection(rangestamp, ids)
+        projection = IncludeProjection(["rangestamp", "ids"])
 
-    hashkey = UnicodeAttribute(hash_key=True)
-    lon_e = NumberAttribute(range_key=True)
+    lon_e = NumberAttribute(hash_key=True)
 
 
 class BboxElevIndex(LocalSecondaryIndex):
@@ -117,7 +106,7 @@ class BboxElevIndex(LocalSecondaryIndex):
         index_name = "elev-index"
         read_capacity_units = 2
         write_capacity_units = 1
-        projection = IncludeProjection(rangestamp, ids)
+        projection = IncludeProjection(["rangestamp", "ids"])
 
     hashkey = UnicodeAttribute(hash_key=True)
     elev = NumberAttribute(range_key=True)
@@ -129,7 +118,7 @@ class BboxSides(Model):
     """
 
     class Meta:
-        table_name = "dynageo"
+        table_name = "BboxSides"
         host = "http://localhost:8000"
 
     hashkey = UnicodeAttribute(hash_key=True)
@@ -138,13 +127,15 @@ class BboxSides(Model):
     lat_l = NumberAttribute(default=0)
     lon_w = NumberAttribute(default=0)
     lon_e = NumberAttribute(default=0)
-    elev = NumberAttribute(default=0)
+    # elev = NumberAttribute(default=0)
     ids = UnicodeSetAttribute(default=None)
     lat_u_index = BboxLatUIndex()
     lat_i_index = BboxLatLIndex()
     lon_w_index = BboxLonWIndex()
     lon_e_index = BboxLonEIndex()
-    elev_index = BboxElevIndex()
+
+
+# elev_index = BboxElevIndex()
 
 
 if __name__ == "__main__":

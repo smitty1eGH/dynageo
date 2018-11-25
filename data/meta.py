@@ -22,6 +22,14 @@ class D(IntEnum):
     lonMin = 17
 
 
+class DLoad(IntEnum):
+    dist_id = 0
+    latMax = 1
+    latMin = 2
+    lonMax = 3
+    lonMin = 4
+
+
 CREATE = """CREATE TABLE dist (dist_id INTEGER PRIMARY KEY AUTOINCREMENT
 , STATEFP,CD115FP,GEOID,NAMELSAD,LSAD
 ,CDSESSN,MTFCC,FUNCSTAT,ALAND,AWATER
@@ -37,3 +45,16 @@ INSERT = """INSERT INTO dist (STATEFP,CD115FP,GEOID,NAMELSAD,LSAD
 VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',%s,%s,%s,%s);"""
 
 DYNOLOAD = "SELECT dist_id,latMax,latMin,lonMax,lonMin FROM dist;"
+
+UBERBBOX = """SELECT 0,"   ", " Latitude ", " Longitude"
+UNION
+SELECT 1,"---", "----------", "-----------"
+UNION
+SELECT 2,"Max", " " || (SELECT max(latMax) FROM dist), " " || (SELECT max(lonMax) FROM dist)
+UNION
+SELECT 3,"Min", (SELECT min(latMin) FROM dist), (SELECT min(lonMin) FROM dist);"""
+
+CONUS = """SELECT "Continental U.S.: " || count(dist_id)
+FROM   dist
+WHERE (latMin >   25) AND (latMax <  50) 
+  AND (lonMin > -125) AND (lonMax < -66);"""
