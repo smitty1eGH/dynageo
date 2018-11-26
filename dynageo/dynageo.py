@@ -4,7 +4,7 @@ import logging.config
 import struct
 from typing import *
 from pynamodb.models import Model
-from pynamodb.indexes import GlobalSecondaryIndex, IncludeProjection
+from pynamodb.indexes import GlobalSecondaryIndex, LocalSecondaryIndex, IncludeProjection
 from pynamodb.attributes import (
     UnicodeAttribute,
     NumberAttribute,
@@ -54,9 +54,9 @@ class BboxLatUIndex(GlobalSecondaryIndex):
         index_name = "lat-u-index"
         read_capacity_units = 2
         write_capacity_units = 1
-        projection = IncludeProjection(["rangestamp", "ids"])
+        projection = IncludeProjection(["lat_u", "ids"])
 
-    lat_u = NumberAttribute(hash_key=True)
+    rangestamp= NumberAttribute(hash_key=True)
 
 
 class BboxLatLIndex(GlobalSecondaryIndex):
@@ -69,7 +69,7 @@ class BboxLatLIndex(GlobalSecondaryIndex):
         write_capacity_units = 1
         projection = IncludeProjection(["rangestamp", "ids"])
 
-    lat_l = NumberAttribute(range_key=True)
+    lat_l = NumberAttribute(hash_key=True)
 
 
 class BboxLonWIndex(GlobalSecondaryIndex):

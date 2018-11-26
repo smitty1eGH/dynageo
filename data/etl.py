@@ -10,7 +10,7 @@ from .meta import D, CREATE, INSERT
 
 logger = logging.getLogger("dynageo")
 
-SQLFILE = "ggs650.db"
+SQLFILE = "data/ggs650.db"
 ZIPCODES = "/home/smitty/proj/dynageo/dynageo/data/tl_2016_us_cd115"
 LOAD_DATA = True  # False #
 

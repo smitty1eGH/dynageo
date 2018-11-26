@@ -30,3 +30,4 @@ BboxSqliteTable -> DynamoDBSchema
 
 #+RESULTS:
 [[file:docs/data_ingest.png]]
+

@@ -12,3 +12,4 @@ dist/
 /data/ggs650.db
 logs/
 /shared-local-instance.db
+/ggs650.db

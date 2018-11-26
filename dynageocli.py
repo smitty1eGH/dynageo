@@ -1,5 +1,4 @@
 from datetime import datetime
-from os import rename
 import sqlite3
 
 import click
@@ -23,7 +22,6 @@ def databaseInit():
         existing data/ file.
     """
     dbInit()
-    rename("ggs650.db", "data/ggs650.db")
 
 
 @main.command()
