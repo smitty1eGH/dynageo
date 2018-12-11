@@ -1,5 +1,6 @@
 from datetime import datetime
 import sqlite3
+import time
 
 import click
 import pynamodb
@@ -7,6 +8,8 @@ import pynamodb
 from data.meta import DYNOLOAD, DLoad, UBERBBOX, CONUS
 from data.etl import dbInit, dbLoad
 from dynageo.dynageo import BboxSides, hash_sides
+
+LOAD_DELAY = 1
 
 
 @click.group()
@@ -63,6 +66,7 @@ def dynamoLoad():
     conn = sqlite3.connect("data/ggs650.db")
     c = conn.cursor()
     for row in c.execute(DYNOLOAD):
+        print(row)
         d = hash_sides(
             row[DLoad.latMax], row[DLoad.latMin], row[DLoad.lonMin], row[DLoad.lonMax]
         )
@@ -73,9 +77,10 @@ def dynamoLoad():
             lat_l=row[DLoad.latMin],
             lon_w=row[DLoad.lonMin],
             lon_e=row[DLoad.lonMax],
-            ids=row[DLoad.dist_id],
+            ids=str(row[DLoad.dist_id]),
         )
         e.save()
+        time.sleep(LOAD_DELAY)
 
 
 @main.command()

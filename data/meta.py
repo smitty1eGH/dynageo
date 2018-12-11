@@ -31,7 +31,7 @@ class DLoad(IntEnum):
 
 
 CREATE = """CREATE TABLE dist (dist_id INTEGER PRIMARY KEY AUTOINCREMENT
-, STATEFP,CD115FP,GEOID,NAMELSAD,LSAD
+,STATEFP,CD115FP,GEOID,NAMELSAD,LSAD
 ,CDSESSN,MTFCC,FUNCSTAT,ALAND,AWATER
 ,INTPTLAT,INTPTLON,bbox,points,latMax
 ,latMin,lonMax,lonMin);"""
@@ -42,7 +42,7 @@ INSERT = """INSERT INTO dist (STATEFP,CD115FP,GEOID,NAMELSAD,LSAD
 ,CDSESSN,MTFCC,FUNCSTAT,ALAND,AWATER
 ,INTPTLAT,INTPTLON,bbox,points,latMax
 ,latMin,lonMax,lonMin)
-VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s',%s,%s,%s,%s);"""
+VALUES ('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s', '%s','%s','%s','%s',%s, %s,%s,%s);"""
 
 DYNOLOAD = "SELECT dist_id,latMax,latMin,lonMax,lonMin FROM dist;"
 

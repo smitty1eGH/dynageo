@@ -2,11 +2,14 @@ import inspect
 import sqlite3
 from typing import List
 
+
+from pynamodb.connection import Connection
+
 from pynamodb.attributes import NumberAttribute, UTCDateTimeAttribute
 from pynamodb.expressions.condition import Comparison
 import pytest
 
-from dynageo.dynageo import BboxSides
+from dynageo.dynageo import BboxSides, Criteria
 from data.meta import DLoad
 
 
@@ -22,9 +25,10 @@ def kentucky() -> str:
 
 @pytest.fixture
 def k_crit() -> List[float]:
-    return [0.0, 39.25, 36.26, -81, 35, -89.60]
+    return [0.0, 39.25, 36.26, -89.60, -81.35]
 
 
+@pytest.mark.skip
 def test_sqlite_kentucky(kentucky: str):
     conn = sqlite3.connect("data/ggs650.db")
     c = conn.cursor()
@@ -33,6 +37,28 @@ def test_sqlite_kentucky(kentucky: str):
 
 
 def test_dynamo_kentucky(k_crit: List[float]):
+    qu = Criteria(
+        k_crit[DLoad.latMax],
+        k_crit[DLoad.latMin],
+        k_crit[DLoad.lonMin],
+        k_crit[DLoad.lonMax],
+    )
+    qu.query(BboxSides)
+    print(qu.reduce())
+
+
+@pytest.mark.skip
+def test_low_level(k_crit):
+    conn = Connection()
     condition = NumberAttribute(attr_name="lat_u") <= k_crit[DLoad.latMax]
-    for z in BboxSides.lat_u_index.query("rangestamp", filter_condition=condition):
-        print(z)
+    resp = [
+        x["ids"]["S"]
+        for x in conn.rate_limited_scan(
+            "BboxSides",
+            filter_condition=condition,
+            attributes_to_get=["ids"],
+            index_name="lat-u-index",
+        )
+    ]
+    for r in resp:
+        print(sorted(r))
