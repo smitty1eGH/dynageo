@@ -214,8 +214,7 @@ class BboxSides(Model):
     class Meta:
         table_name = "BboxSides"
         region = "us-east-1"
-
-    # host = "http://localhost:8000"
+        host = "http://localhost:8000"
 
     hashkey = UnicodeAttribute(hash_key=True)
     rangestamp = UTCDateTimeAttribute(range_key=True)

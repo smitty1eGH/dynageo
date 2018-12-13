@@ -33,6 +33,7 @@ def test_sqlite_kentucky(kentucky: str):
     conn = sqlite3.connect("data/ggs650.db")
     c = conn.cursor()
     x = [row for row in c.execute(kentucky)]
+    print(x)
     assert len(x) == 6
 
 

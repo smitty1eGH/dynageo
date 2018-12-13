@@ -1,0 +1,65 @@
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS: [twocolumns,letterpaper]
+#+TITLE: Dynageo: A Minimum Bounding Rectangle Indexing Method Using DynamoDb
+#+AUTHOR:	Christopher L. Smith
+#+KEYWORDS: cloud, dynamodb, python, spatial index, aws
+Word count: 855\\
+* Abstract:
+Research Motivation: Indices are as ubiquitous in computing as a Table of Contents in a book, and for the same reason: speeding up locating specific information. Research into indexing methods is as old as information systems. In the Geospatial context, the R-Tree and derivates have been well-explored for decades. But industry has turned a corner in the last decade, exposing storage and computation resources over the network as "the cloudi".
+This project implements a proof-of-concept using the Amazon DynamoDb to host a geospatial index. As this work will use a small data set (U.S. zip codes) against a stand-alone DynamoDB service (to avoid cost), substantial benchmarking against the live DynamoDb service will be deferred to follow-on research.
+
+* Prior Art: 
+Thus, the question poses itself: how would an R-Tree (Guttman, 1984) work in the cloud, when its logic implicitly happens in a single address space?
+-	One example, (Xian, Shao, Wang, 2016) implements an R-Tree index directly in MongoDb, with the internal document ID used to manage the traversals between the tree nodes.
+-	The popular open source tool GeoWave (Whitby, Fecher, Bennight 2017) employs space filling curves (SFCs).
+
+* Research Question: 
+Can a "map reduce" against a DynamoDb table offer effective geospatial querying? This approach proposes to ingest the polygon Minimum Bounding Rectangle (MBR) as discrete parameters and IDs of contained polygons as the value portion, using a hash of the MBR as the range key. By populating local secondary indices against the four MBR side coordinates (that is, indexing the index itself), we intend to perform a sort of "map-reduce" (see Query Outline below) against the MBR to derive the final set of contained polygons.
+DynamoDb is a key-value store of the common NoSQL ilk. A brief overview of the proposed schema:
+
+| Key0	                  | 	Key1                 | Value0	        | Value1           | Value2           | 	Value3	       | Payload                |
+| Range Key hashed of MBR | 	Sort Key timestamp	 | (indexed) lat_u | (indexed)i lat_l | (indexed)	lon_w | (indexed)	lon_e | (indexed)	List of IDs |
+
+Unsurprisingly, this work needs the same sort of auxiliary tables that were used in (Xian, Shao, Wang, 2016), so their schema taxonomy will be borrowed.
+This project will load the same set of zip code MBR information into both:
+-	a DynamoDb service (running locally) and
+-	a traditional R-Tree index,
+and note the performance tradeoffs, in addition to using the R-Tree version as a validity check against the DynamoDb implementation.
+Note that this work would be conducted against an off-line DynamoDB server, where development cost is avoided, but the performance characteristics of the cloud proper would not be obtained.  It is anticipated that the offline DynamoDb performance will be worse, but how much worse?
+
+* Research Utility: 
+A tremendous driver in the design of real-world systems is the cost-performance tradeoff. Avoiding administrative costs by factoring out the physical host machines for systems is a common approach.  The state of the art is to package the logic and support libraries for a service into a container that virtualizes the file- and operating-systems. Docker and its various orchestration tools form the canonical example.
+We can arrive at a prototype for a "serverless" geospatial index if we are careful to ensure that the management functions for a DynamoDb index are suitable for deployment against the Amazon Lambda service. That is, simplifying the system design by obviating the need for re-balancing a tree will be an important goal, as the service is priced in read-write bandwidth. There is no free lunch; by using a hosted service, much of the management overhead for the storage is purely internal to the system, reducing implementation and maintenance concerns.
+It is anticipated that "indexing the index" could lead to other novel querying advances, e.g. returning both polygon containment and intersection information. "nearest neighbor" calculations might be attained by taking the MBR of a reference object and expanding that MBR to form a search MBR expanded by the desired range in all four rectangular directions, and then reducing the results. This becomes a question of scalability. The DynamoDb service does substantial internal partitioning using the range key to provide predictable performance at scale. Acquiring sufficient provisioned throughput to match R-Tree performance could prove cost-prohibitive.
+
+* System Setup:
+1.	Sample geospatial data obtained: U.S. Zip Codes.
+2.	Obtain data. (done)
+3.	Load and shapefiles into a handier SQLite schema. Extract MBR information from shape files.
+4.	Load transformed zip code data into r-tree index using scipy/numpy, and into DynamoDb.
+
+* Query Approach:
+1.	Decide upon diagonal points for criteria.
+2.	Transform those points into an MBR.
+3.	Query traditional R-Tree for zip codes existing within the MBR, as regression testing data.
+4.	For DynamoDb, those points will each become a separate index query.
+5.	As the index queries return, read their zip codes into a python set.
+6.	Take the intersection of all four sets. Compare with the R-Tree containment list in Step #3.
+
+* Deliverables:
+-	This work will produce the following deliverables:
+-	A public GitHub repository with the code, including:
+-	Command-line tool for 
+o	db. setup 
+o	db load utility
+o	db test suite
+-	Summary report comparing performance of dynageo to rtree.
+
+Not-deliverable: any sort of user interface or remotely callable API. There will be a unit test suite that demonstrates the system.
+
+* References:
+(Guttman, 1984). R-trees: a dynamic index structure for spatial searching. In Proceedings of the 1984 ACM SIGMOD international conference on Management of data (SIGMOD '84). ACM, New York, NY, USA, 47-57. DOI= http://dx.doi.org/10.1145/602259.602266 
+
+(Xian, Shao, Wang, 2016). Providing R-Tree Support for Mongodb. ISPRS - International Archives of the Photogrammetry, Remote Sensing and Spatial Information Sciences. 545-549. http://adsabs.harvard.edu/abs/2016ISPAr41B4..545X
+
+(Whitby, Fecher, Bennight 2017).  GeoWave: Utilizing Distributed Key-Value Stores for Multidimensional Data. Springer International Publishing. 105-122. https://link.springer.com/chapter/10.1007/978-3-319-64367-0_6
