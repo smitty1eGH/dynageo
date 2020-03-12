@@ -16,7 +16,7 @@ more-itertools==4.3.0
 munch==2.3.2
 pluggy==0.8.0
 port-for==0.4
-psutil==5.4.7
+psutil==5.6.6
 py==1.7.0
 pynamodb==3.3.1
 pyshp==2.0.1
